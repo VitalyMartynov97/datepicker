@@ -1,6 +1,7 @@
 const CLASS_NAME        = 'vm_datepicker'
 const USER_DATE_FORMAT  = 'DD.MM.YYYY'
 const SYSTEM_DATEFORMAT = 'YYYY-MM-DD'
+const CALENDAR_CLASS    = 'vm_dtp_c'
 
 document.addEventListener('DOMContentLoaded', function(){
     let urls = [
@@ -17,60 +18,75 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 function whenAvailable(names, callback) {
-    var interval = 100; 
-
     window.setTimeout(function() {
-        let all_upload = false
         for (lib_index in names)
         {
-            all_upload = window[names[lib_index]]
+            if (!window[names[lib_index]])
+            {
+                whenAvailable(names, callback);
+            }
         }
-        if (all_upload) {
-            callback(window[names[0]]);
+        callback();
+    }, 250);
+}
+
+function createCalendarCss() {
+    let style = "<style type='text/css'> ."+CALENDAR_CLASS+"{"
+
+    style += "width:200px;"
+    style += "height:200px;"
+    style += "background-color:#fff;"
+    style += "border:1px solid black;"
+    style += "border-radius:5px;"
+    style += "} </style>"
+
+    $(style).appendTo("head");
+}
+
+function destroyCalendars() {
+    $('.'+CALENDAR_CLASS).remove()
+}
+
+whenAvailable(['jQuery', 'moment'], function() {
+    createCalendarCss()
+
+    $("body").click(function(e) {
+        if (e.target.classList.contains(CALENDAR_CLASS) || e.target.classList.contains(CLASS_NAME))
+        {
+            return;
+        }
+        if ($(e.target).parents("#myDiv").length) {
+            alert("Inside div");
         } else {
-            whenAvailable(names, callback);
+            destroyCalendars()
         }
-    }, interval);
-}
+    });
 
-function getContainers() {
-    return $('.'+CLASS_NAME);
-}
-
-function addNowDates() {
-    let input_list = getContainers()
-
-    for (input_index in input_list)
-    {
-        input_list[input_index].value = moment().format(USER_DATE_FORMAT)
-    }
-}
-
-function addDaemons() {
-    let input_list = getContainers()
-
-    for (input_index in input_list)
-    {
-        input_list[input_index].addEventListener('click', function(){    
-            // or
-            $('<div>hello</div>').appendTo($(input_list[input_index].closest('div')));
-        })
-    }
-}
-
-function setStyle() {
-    let input_list = getContainers()
+    let input_list = $('.'+CLASS_NAME)
 
     for (input_index in input_list)
     {
        input_list[input_index].style = 'cursor: pointer;'
+       input_list[input_index].value = moment().format(USER_DATE_FORMAT)
     }
-}
 
-// code starts...
+    $('.'+CLASS_NAME).click(function(e){
+        destroyCalendars()
 
-whenAvailable(['jQuery', 'moment'], function(t) {
-    setStyle()
-    addNowDates()
-    addDaemons()
+        // let clicked_input = $('.'+CLASS_NAME).index(this)
+        // $(this);
+
+        let $div = $("<div>", {
+            id: "test_calendar", 
+            "class": CALENDAR_CLASS,
+        })
+
+        // destroy calendar if user has clicked outside the calendar 
+        $div.click(function(e){})
+
+        let $select_year = $("<select>", {})
+        $div.append($select_year) 
+
+        $("body").append($div)
+    });
 });
