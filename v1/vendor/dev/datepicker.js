@@ -1,4 +1,6 @@
-const CLASS_NAME = 'vm_datepicker'
+const CLASS_NAME        = 'vm_datepicker'
+const USER_DATE_FORMAT  = 'DD.MM.YYYY'
+const SYSTEM_DATEFORMAT = 'YYYY-MM-DD'
 
 document.addEventListener('DOMContentLoaded', function(){
     let urls = [
@@ -40,7 +42,7 @@ function addNowDates() {
 
     for (input_index in input_list)
     {
-        input_list[input_index].value = moment().format('YYYY-MM-DD')
+        input_list[input_index].value = moment().format(USER_DATE_FORMAT)
     }
 }
 
@@ -49,7 +51,10 @@ function addDaemons() {
 
     for (input_index in input_list)
     {
-       // input_list[input_index].value = '123'
+        input_list[input_index].addEventListener('click', function(){    
+            // or
+            $('<div>hello</div>').appendTo($(input_list[input_index].closest('div')));
+        })
     }
 }
 
